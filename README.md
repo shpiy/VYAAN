@@ -1,6 +1,9 @@
 # VYAAN
 ___
 
+## ⚠️ Important Notice
+**This README was generated using AI assistance. Please review and verify all commands before executing them on your system. While the instructions have been carefully crafted, always ensure commands are appropriate for your specific environment and security requirements.**
+
 ## Requirements
 
 - Python 3.7 or higher
