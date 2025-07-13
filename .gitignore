@@ -1,0 +1,7 @@
+# File
+
+
+# Directory
+.vscode/
+.venv/
+__pycache__/
