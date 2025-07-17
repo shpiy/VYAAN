@@ -12,6 +12,7 @@ from typing import List
 class ExerciseType(Enum):
     '''Enumeration of supported exercise types.'''
     KNEE_FLEXION = 'kneeFlexion'
+    PARTIAL_SQUAT = 'partialSquat'
 
 @dataclass
 class ExerciseConfig:
@@ -52,5 +53,12 @@ class ExerciseConfigs:
             extendedThreshold=170.0,
             flexedThreshold=108.0,
             side='RIGHT'
+        ),
+        ExerciseType.PARTIAL_SQUAT: ExerciseConfig(
+            name='Partial Squat',
+            landMarks=['HIP', 'KNEE', 'ANKLE'],
+            extendedThreshold=170.0,
+            flexedThreshold=120.0,
+            side='BOTH'
         )
     }
