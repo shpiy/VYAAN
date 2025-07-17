@@ -4,6 +4,28 @@ ___
 ## ⚠️ Important Notice
 **This README was generated using AI assistance. Please review and verify all commands before executing them on your system. While the instructions have been carefully crafted, always ensure commands are appropriate for your specific environment and security requirements.**
 
+## Features
+
+### Core Capabilities
+
+- **Realt-time Pose Tracking**: MediaPipe-powered body landmark detection
+- **Exercise Counting**: Automatic repetition counting with visual feedback
+- **Angle Measurement**: Real-time joint angle calculation and display
+
+### Latest Enchancements
+
+- **➕ Partial Squat Exercise**: New bilateral exercise tracking
+- **🎯 Hysteresis Control**: 5° buffer prevents false rep counting
+- **🔄 Bilateral Tracking**: 'BOTH' mode for symmetric exercises
+- **🦴 Fallback Landmark Estimation**: Body proportion-based detection when joints are obscured
+- **📐 Posture Flexibility**: Better adaptation to different body types
+
+### Robustness Features
+- **Error Resilience**: Graceful degradation when landmarks are lost
+- **Angle Smoothing**: Moving average reduces measurement jitter
+- **Adaptive Detection**: Works with various camera angles and positions
+- **Comprehensive Logging**: Detailed diagnostics for troubleshooting
+
 ## Requirements
 
 - Python 3.7 or higher
