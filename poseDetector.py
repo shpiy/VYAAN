@@ -6,11 +6,14 @@ Handles pose estimation and landmark extraction.
 import cv2
 import mediapipe
 import numpy
+import logging
 from typing import List, Optional, Tuple, Any
 
 from config import ExerciseConfig, CameraConfig
 
 
+
+logger = logging.getLogger(__name__)
 
 class PoseDetector:
     '''Handles poses detection and landmark extraction.'''
@@ -46,7 +49,7 @@ class PoseDetector:
             results = self.pose.process(rgbFrame)
             return results
         except Exception as err:
-            print(f'Pose detection error: {err}')
+            logger.error(f'Pose detection error: {err}')
             return None
 
     def extractLandmarks(self, landMarks, exerciseConfig: ExerciseConfig) -> Optional[Tuple[List[float], List[float], List[float]]]:
@@ -72,7 +75,7 @@ class PoseDetector:
 
             return tuple(positions)
         except (AttributeError, IndexError) as err:
-            print(f'Failed to extract landmarks: {err}')
+            logger.warning(f'Failed to extract landmarks: {err}')
             return None
     
     def drawLandmarks(self, frame: numpy.ndarray, poseResults, landMarkColor: tuple, connectionColor: tuple) -> None:

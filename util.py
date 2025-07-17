@@ -4,9 +4,12 @@ Contains angle calculations and other helper functions.
 '''
 
 import numpy
+import logging
 from typing import List
 
 
+
+logger = logging.getLogger(__name__)
 
 class AngleCalculator:
     '''Utility class for angle calculations.'''
@@ -37,7 +40,7 @@ class AngleCalculator:
 
             return angle
         except Exception as err:
-            print(f'Error calculating angle: {err}')
+            logger.error(f'Error calculating angle: {err}')
             return 0.0
 
     @staticmethod
@@ -86,5 +89,5 @@ class ValidateUtils:
                 
             return True
         except Exception as err:
-            print(f'Landmark validation error: {err}')
+            logger.error(f'Landmark validation error: {err}')
             return False

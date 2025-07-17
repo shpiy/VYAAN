@@ -2,6 +2,7 @@
 Exercise tracking logic and state management.
 Handles exercise counting, state transitions, and statistics.
 '''
+import logging
 from typing import Dict, Any, List
 from dataclasses import dataclass
 
@@ -9,6 +10,8 @@ from config import ExerciseConfig
 from util import AngleCalculator
 
 
+
+logger = logging.getLogger(__name_)
 
 @dataclass
 class ExerciseState:
@@ -37,7 +40,7 @@ class ExerciseTracker:
         self.state = ExerciseState()
         self.maxHistoryLength = 10
 
-        print(f'Initialized tracker for {self.config.name}')
+        logger.info(f'Initialized tracker for {self.config.name}')
     
     def updateState(self, angle: float) -> bool:
         '''
@@ -62,7 +65,7 @@ class ExerciseTracker:
             self.state.stage = 'flexed'
             self.state.counter += 1
 
-            print(f'{self.config.name} Rep: {self.state.counter}')
+            logger.info(f'{self.config.name} Rep: {self.state.counter}')
 
         # Return True if a new rep was completed
         return self.state.counter > previousCounter
@@ -73,7 +76,7 @@ class ExerciseTracker:
         self.state.stage =  None
         self.state.angleHistory = []
 
-        print(f'{self.config.name} counter reset')
+        logger.info(f'{self.config.name} counter reset')
 
     def getStats(self) -> Dict[str, Any]:
         '''Get current exercise statistics.'''

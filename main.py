@@ -3,6 +3,7 @@ Main application module.
 Coordinates all components and handles the main application loop.
 '''
 import cv2
+import logging
 from typing import Optional, Any
 
 from config import ExerciseType, ExerciseConfigs, CameraConfig, DisplaySettings
@@ -12,6 +13,13 @@ from exerciseTracker import ExerciseTracker
 from uiRenderer import UIRenderer
 
 
+
+# COnfigure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class ExerciseApp:
     '''Main application class that coordinates all components.'''
@@ -37,7 +45,7 @@ class ExerciseApp:
         self.videoCapture: Optional[cv2.VideoCapture] = None
         self.running = True
 
-        print(f'Initialized {self.exerciseConfig.name} application')
+        logger.info(f'Initialized {self.exerciseConfig.name} application')
 
     def setupCamera(self) -> bool:
         '''
@@ -49,17 +57,17 @@ class ExerciseApp:
         try:
             self.videoCapture = cv2.VideoCapture(self.cameraConfig.index)
             if not self.videoCapture.isOpened():
-                print(f'Failed to open camera {self.cameraConfig.index}')
+                logger.error(f'Failed to open camera {self.cameraConfig.index}')
                 return False
 
             # Set camera properties
             self.videoCapture.set(cv2.CAP_PROP_FRAME_WIDTH, self.cameraConfig.width)
             self.videoCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.cameraConfig.height)
 
-            print('Camera setup successful')
+            logger.info('Camera setup successful')
             return True
         except Exception as err:
-            print(f'Camera setup failed: {err}')
+            logger.error(f'Camera setup failed: {err}')
             return False
         
     def processFrame(self, frame) -> Optional[Any]:
@@ -99,7 +107,7 @@ class ExerciseApp:
 
             return frame
         except Exception as err:
-            print(f'Frame processing error: {err}')
+            logger.error(f'Frame processing error: {err}')
             return frame
         
     def handleKeyPress(self, key: int) -> bool:
@@ -113,14 +121,14 @@ class ExerciseApp:
             True to continue, False to exit
         '''
         if key == ord('q'):
-            print('Quit requested')
+            logger.info('Quit requested')
             return False
         elif key == ord('r'):
             self.exerciseTracker.resetCounter()
         elif key == ord('s'):
             # Save current stats
             stats = self.exerciseTracker.getStats()
-            print(f'Current stats: {stats}')
+            logger.info(f'Current stats: {stats}')
 
         return True
 
@@ -130,14 +138,14 @@ class ExerciseApp:
             return
         
         self.running = True
-        print(f'Starting {self.exerciseConfig.name} tracking')
-        print(f'Controls: \'q\' to quit, \'r\' to reset, \'s\' to show stats')
+        logger.info(f'Starting {self.exerciseConfig.name} tracking')
+        logger.info('Controls: \'q\' to quit, \'r\' to reset, \'s\' to show stats')
 
         try:
             while self.running and self.videoCapture.isOpened():
                 returnVar, frame = self.videoCapture.read()
                 if not returnVar:
-                    print('Failed to read frame')
+                    logger.error('Failed to read frame')
                     break
 
                 # Process frame
@@ -150,7 +158,7 @@ class ExerciseApp:
                 if not self.handleKeyPress(key):
                     break
         except KeyboardInterrupt:
-            print('Interrupted by user')
+            logger.info('Interrupted by user')
         finally:
             self.cleanup()
 
@@ -164,7 +172,7 @@ class ExerciseApp:
         cv2.destroyAllWindows()
         self.poseDetector.cleanup()
 
-        print('Cleanup completed')
+        logger.info('Cleanup completed')
 
 
 def main():
@@ -175,7 +183,7 @@ def main():
         App = ExerciseApp(exerciseType=exerciseType)
         App.run()
     except Exception as err:
-        print(f'Application error: {err}')
+        logger.error(f'Application error: {err}')
         return 1
 
     return 0
