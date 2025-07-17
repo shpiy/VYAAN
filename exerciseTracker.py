@@ -11,7 +11,7 @@ from util import AngleCalculator
 
 
 
-logger = logging.getLogger(__name_)
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ExerciseState:
@@ -52,6 +52,10 @@ class ExerciseTracker:
         Returns:
             True if a new repetition was completed
         '''
+
+        # Add hysteresis to prevent state oscilattion
+        HYSTERIS = 5.0
+
         # Smooth the angle
         smoothedAngle = AngleCalculator.smoothAngles(self.state.angleHistory, angle, self.maxHistoryLength)
 
@@ -59,9 +63,9 @@ class ExerciseTracker:
         previousCounter = self.state.counter
 
         # Update stage based on angle thresholds
-        if smoothedAngle > self.config.extendedThreshold:
+        if smoothedAngle > (self.config.extendedThreshold + HYSTERIS):
             self.state.stage = 'extended'
-        elif smoothedAngle < self.config.flexedThreshold and self.state.stage == 'extended':
+        elif smoothedAngle < (self.config.flexedThreshold - HYSTERIS) and self.state.stage == 'extended':
             self.state.stage = 'flexed'
             self.state.counter += 1
 
