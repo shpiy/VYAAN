@@ -1,3 +1,7 @@
+'''
+Main application module.
+Coordinates all components and handles the main application loop.
+'''
 import cv2
 from typing import Optional, Any
 
@@ -10,28 +14,45 @@ from uiRenderer import UIRenderer
 
 
 class ExerciseApp:
+    '''Main application class that coordinates all components.'''
+
     def __init__(self, exerciseType: ExerciseType):
+        '''
+        Initialize the exercise application.
+
+        Args:
+            exerciseType: Type of exercise to track
+        '''
         self.exerciseType = exerciseType
         self.exerciseConfig = ExerciseConfigs.CONFIGS[exerciseType]
         self.cameraConfig = CameraConfig()
         self.displaySettings = DisplaySettings()
 
+        # Initialize components
         self.poseDetector = PoseDetector(self.cameraConfig)
         self.exerciseTracker = ExerciseTracker(self.exerciseConfig)
         self.uiRenderer = UIRenderer(self.displaySettings, self.cameraConfig.width, self.cameraConfig.height)
 
+        # Video capture
         self.videoCapture: Optional[cv2.VideoCapture] = None
         self.running = True
 
         print(f'Initialized {self.exerciseConfig.name} application')
 
     def setupCamera(self) -> bool:
+        '''
+        Setup camera capture.
+
+        Returns:
+            True if camera setup successful
+        '''
         try:
             self.videoCapture = cv2.VideoCapture(self.cameraConfig.index)
             if not self.videoCapture.isOpened():
                 print(f'Failed to open camera {self.cameraConfig.index}')
                 return False
 
+            # Set camera properties
             self.videoCapture.set(cv2.CAP_PROP_FRAME_WIDTH, self.cameraConfig.width)
             self.videoCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, self.cameraConfig.height)
 
@@ -42,22 +63,35 @@ class ExerciseApp:
             return False
         
     def processFrame(self, frame) -> Optional[Any]:
+        '''
+        Process a single frame.
+
+        Args:
+            frame: Input frame
+
+        Returns:
+            Processed frame or None if processing failed
+        '''
         try:
+            # Detect pose
             poseResults = self.poseDetector.detectPose(frame)
             if not poseResults or not poseResults.pose_landmarks:
                 return frame
             
+            # Extract landmarks
             landMarkPositions = self.poseDetector.extractLandmarks(poseResults.pose_landmarks.landmark, self.exerciseConfig)
 
             if landMarkPositions:
                 pointA, pointB, pointC = landMarkPositions
-                angle = AngleCalculator.calculateAngle(pointA=pointA, pointB=pointB, pointC=pointC)
+                angle = AngleCalculator.calculateAngle(pointA=pointA, pointB=pointB, pointC=pointC) # Calculate angle
 
-                self.exerciseTracker.updateState(angle=angle)
-                self.uiRenderer.drawAngleAtJoint(frame, angle, pointB)
+                self.exerciseTracker.updateState(angle=angle) # Update exercise state
+                self.uiRenderer.drawAngleAtJoint(frame, angle, pointB) # Draw angle at joint
 
+            # Draw pose landmarks
             self.poseDetector.drawLandmarks(frame, poseResults, self.displaySettings.landmarkColor, self.displaySettings.connectionColor)
 
+            # Draw UI
             stats = self.exerciseTracker.getStats()
             self.uiRenderer.drawInfoBox(frame, stats)
             self.uiRenderer.drawInstructions(frame)
@@ -69,18 +103,29 @@ class ExerciseApp:
             return frame
         
     def handleKeyPress(self, key: int) -> bool:
+        '''
+        Handle keyboard input.
+
+        Args;
+            key: Key code
+
+        Returns:
+            True to continue, False to exit
+        '''
         if key == ord('q'):
             print('Quit requested')
             return False
         elif key == ord('r'):
             self.exerciseTracker.resetCounter()
         elif key == ord('s'):
+            # Save current stats
             stats = self.exerciseTracker.getStats()
             print(f'Current stats: {stats}')
 
         return True
 
     def run(self) -> None:
+        '''Run the main application loop.'''
         if not self.setupCamera():
             return
         
@@ -95,10 +140,12 @@ class ExerciseApp:
                     print('Failed to read frame')
                     break
 
+                # Process frame
                 processedFrame = self.processFrame(frame)
                 if processedFrame is not None:
-                    cv2.imshow(f'{self.exerciseConfig.name} Tracker', processedFrame) 
+                    cv2.imshow(f'{self.exerciseConfig.name} Tracker', processedFrame) # Display frame
 
+                # Handle key presses
                 key = cv2.waitKey(1) & 0xFF
                 if not self.handleKeyPress(key):
                     break
@@ -108,6 +155,7 @@ class ExerciseApp:
             self.cleanup()
 
     def cleanup(self) -> None:
+        # Clean up resources.
         self.running = False
 
         if self.videoCapture:
@@ -120,6 +168,7 @@ class ExerciseApp:
 
 
 def main():
+    '''Main function.'''
     exerciseType = ExerciseType.KNEE_FLEXION
 
     try:

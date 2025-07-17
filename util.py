@@ -1,11 +1,29 @@
+'''
+Utility functions for exercise tracking system.
+Contains angle calculations and other helper functions.
+'''
+
 import numpy
 from typing import List
 
 
 
 class AngleCalculator:
+    '''Utility class for angle calculations.'''
+
     @staticmethod
     def calculateAngle(pointA: List[float], pointB: List[float], pointC: List[float]) -> float:
+        '''
+        Calculate angle between three points.
+
+        Args:
+            pointA: First point coordinated [x, y]
+            pointB: Vertex point coordinated [x, y]
+            pointC: Third point coordinated [x, y]
+
+        Returns:
+            Angle in degrees
+        '''
         try:
             startPoint = numpy.array(pointA)
             midPoint = numpy.array(pointB)
@@ -24,6 +42,17 @@ class AngleCalculator:
 
     @staticmethod
     def smoothAngles(angleHistory: List[float], newAngle: float, maxHistory: int = 10) -> float:
+        '''
+        Apply smoothing to angle measurements.
+        
+        Args:
+            angleHistory; History of angle measurements
+            newAngle: New angle measurement
+            maxHistory: Maximum number of angles to keep in history
+
+        Returns:
+            Smoothed angle
+        '''
         angleHistory.append(newAngle)
         if len(angleHistory) > maxHistory:
             angleHistory.pop(0)
@@ -32,13 +61,26 @@ class AngleCalculator:
 
 
 class ValidateUtils:
+    '''Utility class for validation functions.'''
+
     @staticmethod
     def validateLandmarks(landMarks, requiredLandmarks: List[str]) -> bool:
+        '''
+        Validate that required landmarks are present
+
+        Args:
+            landMarks: MediaPipe pose landmarks
+            requiredLandmarks: List of required landmark name
+
+        Returns:
+            True if all landmarks are present and valid
+        '''
         if not landMarks:
             return False
         
         try:
             for landMarkName in requiredLandmarks:
+                # Check if landmark exists and has valid coordinates
                 if not hasattr(landMarkName, landMarkName.lower()):
                     return False
                 
